@@ -3,6 +3,10 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from "uniqid";
 import fs from "fs";
+import httpErrors from "http-errors";
+import { checkProductSchema, triggerBadRequest } from './validators.js';
+
+const { NotFound } = httpErrors;
 
 const productsRouter = express.Router();
 
@@ -15,7 +19,7 @@ const getproducts = () => JSON.parse(fs.readFileSync(productsJSONPath));
 const writeproducts = (productsArray) =>
   fs.writeFileSync(productsJSONPath, JSON.stringify(productsArray));
 
-productsRouter.post("/", (req, res, next) => {
+productsRouter.post("/", checkProductSchema,triggerBadRequest, (req, res, next) => {
   try {
     const newproduct = {
       ...req.body,
@@ -55,7 +59,12 @@ productsRouter.get("/:productId", (req, res, next) => {
     const product = products.find(
       (product) => product._id === req.params.productId
     );
-    res.send(product);
+    if (product) {
+      res.send(product);
+    } else {
+      // createHttpError(404, `Product id ${req.params.productId} not found!`)
+      next(NotFound(`Product id ${req.params.productId} not found!`));
+    }
   } catch (error) {
     next(error);
   }
@@ -68,15 +77,19 @@ productsRouter.put("/:productId", (req, res, next) => {
     const index = products.findIndex(
       (product) => product._id === req.params.productId
     );
-    const oldproduct = products[index];
-    const updatedproduct = {
-      ...oldproduct,
-      ...req.body,
-      updatedAt: new Date()
-    };
-    products[index] = updatedproduct;
-    writeproducts(products);
-    res.send(updatedproduct);
+    if (index !== -1) {
+      const oldproduct = products[index];
+      const updatedproduct = {
+        ...oldproduct,
+        ...req.body,
+        updatedAt: new Date()
+      };
+      products[index] = updatedproduct;
+      writeproducts(products);
+      res.send(updatedproduct);
+    } else {
+      next(NotFound(`Product id ${req.params.productId} not found!`));
+    }
   } catch (error) {
     next(error);
   }
@@ -88,8 +101,12 @@ productsRouter.delete("/:productId", (req, res, next) => {
     const remainingproducts = products.filter(
       (product) => product._id !== req.params.productId
     );
-    writeproducts(remainingproducts);
-    res.status(204).send();
+    if (products.length !== remainingproducts.length) {
+      writeproducts(remainingproducts);
+      res.status(204).send();
+    } else {
+      next(NotFound(`Product id ${req.params.productId} not found!`));
+    }
   } catch (error) {
     next(error);
   }
