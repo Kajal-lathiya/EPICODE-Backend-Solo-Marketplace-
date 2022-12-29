@@ -32,11 +32,34 @@ const productSchema = {
             errorMassage:'Category is a mandatory field and needs to be a string!',
         },
     },
-
-
 };
 
+
+const reviewSchema = {
+    comment: {
+      in: ["body"],
+      isString: {
+        errorMassage: "Comment is a mandatory field and needs to be a string!"
+      }
+    },
+    rate: {
+      in: ["body"],
+      isNumeric: {
+        errorMassage:
+          "Rate is a mandatory field and needs to be a maximum 5 number!"
+      }
+    },
+    productId: {
+      in: ["body"],
+      isString: {
+        errorMassage: "productId is a mandatory field and needs to be a string!"
+      }
+    }
+  };
+  
+  
 export const checkProductSchema = checkSchema(productSchema);
+export const checkReviewSchema = checkSchema(reviewSchema);
 
 export const triggerBadRequest = (req, res, next) => {
     const errors = validationResult(req);

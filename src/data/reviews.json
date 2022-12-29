@@ -1,0 +1,23 @@
+[{
+        "comment": "A good book but definitely",
+        "rate": 1,
+        "productId": "2tu3h0lc26dety",
+        "createdAt": "2022-12-26T18:17:44.362Z",
+        "_id": "2tua0slc54gqln",
+        "updatedAt": "2022-12-26T18:32:03.821Z"
+    },
+    {
+        "comment": "A good book but definitely I don't like many parts of the plot",
+        "rate": 3,
+        "productId": "2tu3h0lc26dety",
+        "createdAt": "2022-12-26T18:18:22.111Z",
+        "_id": "2tua0slc54hjq7"
+    },
+    {
+        "comment": "A good book but definitely",
+        "rate": 5,
+        "productId": "2tu8uwlc26ic1n",
+        "createdAt": "2022-12-26T18:21:37.640Z",
+        "_id": "2tu7mwlc54lqll"
+    }
+]

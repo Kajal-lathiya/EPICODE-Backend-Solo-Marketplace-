@@ -1,45 +1,39 @@
 import express from "express";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import uniqid from "uniqid";
-import fs from "fs";
 import httpErrors from "http-errors";
-import { checkProductSchema, triggerBadRequest } from './validators.js';
+import { checkProductSchema, triggerBadRequest } from "./validators.js";
+import { getProducts, writeProducts } from "../../lib/fs-tools.js";
 
 const { NotFound } = httpErrors;
 
 const productsRouter = express.Router();
 
-const productsJSONPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "products.json"
+productsRouter.post(
+  "/",
+  checkProductSchema,
+  triggerBadRequest,
+  async (req, res, next) => {
+    try {
+      const newproduct = {
+        ...req.body,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        _id: uniqid()
+      };
+
+      const productsArray = await getProducts();
+      productsArray.push(newproduct);
+      await writeProducts(productsArray);
+      res.status(201).send({ id: newproduct.id });
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 
-const getproducts = () => JSON.parse(fs.readFileSync(productsJSONPath));
-const writeproducts = (productsArray) =>
-  fs.writeFileSync(productsJSONPath, JSON.stringify(productsArray));
-
-productsRouter.post("/", checkProductSchema,triggerBadRequest, (req, res, next) => {
+productsRouter.get("/", async (req, res, next) => {
   try {
-    const newproduct = {
-      ...req.body,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      _id: uniqid()
-    };
-
-    const productsArray = getproducts();
-    productsArray.push(newproduct);
-    writeproducts(productsArray);
-    res.status(201).send({ id: newproduct.id });
-  } catch (error) {
-    next(error);
-  }
-});
-
-productsRouter.get("/", (req, res, next) => {
-  try {
-    const productsArray = getproducts();
+    const productsArray = await getProducts();
     if (req.query && req.query.category) {
       const filteredproducts = productsArray.filter(
         (product) => product.category === req.query.category
@@ -53,9 +47,9 @@ productsRouter.get("/", (req, res, next) => {
   }
 });
 
-productsRouter.get("/:productId", (req, res, next) => {
+productsRouter.get("/:productId", async (req, res, next) => {
   try {
-    const products = getproducts();
+    const products = await getProducts();
     const product = products.find(
       (product) => product._id === req.params.productId
     );
@@ -70,9 +64,9 @@ productsRouter.get("/:productId", (req, res, next) => {
   }
 });
 
-productsRouter.put("/:productId", (req, res, next) => {
+productsRouter.put("/:productId", async (req, res, next) => {
   try {
-    const products = getproducts();
+    const products = await getProducts();
 
     const index = products.findIndex(
       (product) => product._id === req.params.productId
@@ -85,7 +79,7 @@ productsRouter.put("/:productId", (req, res, next) => {
         updatedAt: new Date()
       };
       products[index] = updatedproduct;
-      writeproducts(products);
+      await writeProducts(products);
       res.send(updatedproduct);
     } else {
       next(NotFound(`Product id ${req.params.productId} not found!`));
@@ -95,14 +89,14 @@ productsRouter.put("/:productId", (req, res, next) => {
   }
 });
 
-productsRouter.delete("/:productId", (req, res, next) => {
+productsRouter.delete("/:productId", async (req, res, next) => {
   try {
-    const products = getproducts();
+    const products = await getProducts();
     const remainingproducts = products.filter(
       (product) => product._id !== req.params.productId
     );
     if (products.length !== remainingproducts.length) {
-      writeproducts(remainingproducts);
+      await writeProducts(remainingproducts);
       res.status(204).send();
     } else {
       next(NotFound(`Product id ${req.params.productId} not found!`));

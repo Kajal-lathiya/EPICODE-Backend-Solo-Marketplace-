@@ -1,0 +1,52 @@
+[{
+        "name": "1234",
+        "description": "somthing longer",
+        "brand": "nokia",
+        "price": 100,
+        "category": "smartphones",
+        "createdAt": "2022-12-24T16:47:43.443Z",
+        "updatedAt": "2022-12-26T17:46:27.335Z",
+        "_id": "2tu3h0lc26d9w4",
+        "imageUrl": "http://localhost:3001/images/ReactLogo.png"
+    },
+    {
+        "description": "somthing longer",
+        "brand": "nokia",
+        "imageUrl": "http://localhost:3001/images/ReactLogo.png",
+        "price": 100,
+        "category": "smartphones",
+        "createdAt": "2022-12-24T16:47:49.846Z",
+        "updatedAt": "2022-12-26T17:46:50.997Z",
+        "_id": "2tu3h0lc26dety"
+    },
+    {
+        "description": "somthing longer",
+        "brand": "nokia",
+        "imageUrl": "https://drop.ndtv.com/TECH/product_database/images/2152017124957PM_635_nokia_3310.jpeg?downsize=*:420&output-quality=80",
+        "price": 100,
+        "category": "smartphones",
+        "createdAt": "2022-12-24T16:51:34.526Z",
+        "updatedAt": "2022-12-24T16:51:34.526Z",
+        "_id": "2tu8uwlc26i874"
+    },
+    {
+        "description": "somthing longer",
+        "brand": "nokia",
+        "imageUrl": "http://localhost:3001/images/ReactLogo.png",
+        "price": 100,
+        "category": "smartphones",
+        "createdAt": "2022-12-24T16:51:39.515Z",
+        "updatedAt": "2022-12-26T17:42:35.849Z",
+        "_id": "2tu8uwlc26ic1n"
+    },
+    {
+        "description": "somthing longer",
+        "brand": "nokia",
+        "imageUrl": "https://drop.ndtv.com/TECH/product_database/images/2152017124957PM_635_nokia_3310.jpeg?downsize=*:420&output-quality=80",
+        "price": 100,
+        "category": "smartphones",
+        "createdAt": "2022-12-24T16:53:20.138Z",
+        "updatedAt": "2022-12-24T16:53:20.138Z",
+        "_id": "2tu7eolc26khor"
+    }
+]
