@@ -1,6 +1,7 @@
 import express from "express";
 import listEndpoints from "express-list-endpoints";
 import cors from "cors";
+import createHttpError from "http-errors"
 import {join } from "path"
 import productsRouter from "./api/products/index.js";
 import reviewRouter from "./api/reviews/index.js";
@@ -13,7 +14,7 @@ import {
 } from "./errorHandlers.js";
 
 const server = express();
-const port = 3001;
+const port = process.env.PORT;
 const publicFolderPath = join(process.cwd(), './public')
 
 // ***************** MIDDLEWARES ********************
@@ -22,9 +23,21 @@ const loggerMiddleware = (req, res, next) => {
   console.log(`Request method ${req.method} - url ${req.url} `);
   next();
 };
-
+const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
+const corsOptions = {
+  origin: (origin, corsNext) => {
+    console.log("CURRENT ORIGIN: ", origin)
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      // If current origin is in the whitelist you can move on
+      corsNext(null, true)
+    } else {
+      // If it is not --> error
+      corsNext(createHttpError(400, `Origin ${origin} is not in the whitelist!`))
+    }
+  },
+}
 server.use(express.static(publicFolderPath))
-server.use(cors());
+server.use(cors(corsOptions));
 server.use(loggerMiddleware);
 server.use(express.json());
 
