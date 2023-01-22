@@ -8,14 +8,9 @@ import {
 } from "../products/validators.js";
 
 const { NotFound } = httpErrors;
-
 const reviewRouter = express.Router();
 
-reviewRouter.post(
-  "/:productId/reviews",
-  checkReviewSchema,
-  triggerBadRequest,
-  async (req, res, next) => {
+reviewRouter.post("/:productId/reviews", checkReviewSchema, triggerBadRequest, async (req, res, next) => {
     // create review
     try {
       const newReview = { ...req.body, createdAt: new Date(), _id: uniqid() };
@@ -28,7 +23,6 @@ reviewRouter.post(
     }
   }
 );
-
 reviewRouter.get("/:productId/reviews", async (req, res, next) => {
   try {
     const reviewArray = await getReviews();
@@ -37,7 +31,6 @@ reviewRouter.get("/:productId/reviews", async (req, res, next) => {
     next(error);
   }
 });
-
 reviewRouter.get("/:productId/reviews/:reviewId", async (req, res, next) => {
   try {
     const reviews = await getReviews();
@@ -55,7 +48,6 @@ reviewRouter.get("/:productId/reviews/:reviewId", async (req, res, next) => {
     next(error);
   }
 });
-
 reviewRouter.put("/:productId/reviews/:reviewId", async (req, res, next) => {
   try {
     const reviews = await getReviews();
@@ -79,7 +71,6 @@ reviewRouter.put("/:productId/reviews/:reviewId", async (req, res, next) => {
     next(error);
   }
 });
-
 reviewRouter.delete("/:productId/reviews/:reviewId", async (req, res, next) => {
   // delete product review
   try {
@@ -97,5 +88,16 @@ reviewRouter.delete("/:productId/reviews/:reviewId", async (req, res, next) => {
     next(error);
   }
 });
+
+// ***************************** PAGINATION *********************************
+
+reviewRouter.get("/", async (req, res, next) => {
+  try {
+
+    res.send('review pagination method')
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default reviewRouter;

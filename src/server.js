@@ -12,6 +12,7 @@ import {
   notFoundHandler,
   genericErrorHandler
 } from "./errorHandlers.js";
+import mongoose, { mongo } from "mongoose";
 
 const server = express();
 const port = process.env.PORT;
@@ -45,13 +46,21 @@ server.use(express.json());
 server.use("/products", loggerMiddleware, productsRouter);
 server.use("/products", reviewRouter);
 server.use("/product", filesRouter);
-// ****************** ERROR HANDLERS ****************
+// ****************** ERROR HANDLERS *************************
 server.use(badRequestHandler); // 400
 server.use(unauthorizedHandler); // 401
 server.use(notFoundHandler); // 404
 server.use(genericErrorHandler); // 500
 
-server.listen(port, () => {
-  console.table(listEndpoints(server));
-  console.log("Server is running on port:", port);
-});
+//********************* MONGODB CONNECT *************************** */
+mongoose.set("strictQuery", true);
+mongoose.connect(process.env.MONGO_URL);
+
+mongoose.connection.on("connected", () => {
+  console.log("Sccessfully connected to Mongo!");
+  server.listen(port, () => {
+    console.table(listEndpoints(server));
+    console.log("Server is running on port:", port);
+  });
+})
+
