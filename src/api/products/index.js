@@ -5,12 +5,14 @@ import { checkProductSchema, triggerBadRequest } from "./validators.js";
 import { getProducts, writeProducts } from "../../lib/fs-tools.js";
 
 import ProductsModel from "./model.js";
+import q2m from "query-to-mongo";
 import createHttpError from "http-errors";
 
 const { NotFound } = httpErrors;
 
 const productsRouter = express.Router();
 
+// ***************************** PAGINATION *********************************
 productsRouter.post(
   "/",
   checkProductSchema,
@@ -43,8 +45,20 @@ productsRouter.post(
 
 productsRouter.get("/", async (req, res, next) => {
   try {
-    const products = await ProductsModel.find();
-    res.status(200).send(products);
+    const mongoQuery = q2m(req.query);
+    const total = await ProductsModel.countDocuments(mongoQuery.criteria);
+    const products = await ProductsModel.find(
+      mongoQuery.criteria,
+      mongoQuery.options.fields
+    )
+      .limit(mongoQuery.options.limit) // 3
+      .skip(mongoQuery.options.skip) // 2
+      .sort(mongoQuery.options.sort); // 1
+    res.send({
+      links: mongoQuery.links("http://localhost:3001/products", total),
+      totalPages: Math.ceil(total / mongoQuery.options.limit),
+      products
+    });
   } catch (error) {
     next(error);
   }
